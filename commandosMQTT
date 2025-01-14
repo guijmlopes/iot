@@ -1,0 +1,28 @@
+pip3 install CounterFit
+
+
+pip3 install werkzeug==2.2.2
+
+
+pip3 install counterfit-connection
+
+
+pip3 install counterfit-shims-grove
+
+
+mkdir temperature-sensor
+
+
+cd temperature-sensor
+
+
+touch app.py
+
+
+touch server.py
+
+
+pip3 install counterfit-shims-seeed-python-dht
+
+
+pip3 install paho-mqtt==1.6.1

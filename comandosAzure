@@ -1,0 +1,93 @@
+pip3 install CounterFit
+
+
+pip3 install werkzeug==2.2.2
+
+
+pip3 install counterfit-connection
+
+
+pip3 install counterfit-shims-grove
+
+
+mkdir temperature-sensor
+
+
+cd temperature-sensor
+
+
+touch app.py
+
+
+pip3 install counterfit-shims-seeed-python-dht
+
+
+# Migrate your plant to the cloud
+az login
+
+
+az account list --output table
+
+
+az account set --subscription 20186876-8c9e-4bea-8119-9d321e99366b
+
+
+az group create --name 20221702group --location uksouth
+
+
+az iot hub create --resource-group 20221702group --sku F1 --partition-count 2 --name 20221702hub
+
+
+az iot hub device-identity create --device-id 20221702device --hub-name 20221702hub
+
+
+az iot hub device-identity connection-string show --device-id 20221702device --output table --hub-name 20221702hub
+
+
+pip3 install azure-iot-device
+
+
+# Migrate your application logic to the cloud
+mkdir azurite
+
+
+azurite --location azurite
+
+
+mkdir temperature-sensor-trigger
+
+
+cd temperature-sensor-trigger
+
+
+func init --worker-runtime python temperature-sensor-trigger
+
+
+pip3 install -r requirements.txt
+
+
+func start
+
+
+az iot hub connection-string show --default-eventhub --output table --hub-name 20221702hub
+
+
+func new --name iot-hub-trigger --template "Azure Event Hub trigger"
+
+
+func start
+
+
+az iot hub connection-string show --policy-name service --output table --hub-name 20221702hub
+
+
+pip3 install azure-iot-hub
+
+
+az storage account create --resource-group 20221702group --sku Standard_LRS --name 20221702sms 
+
+
+az functionapp create --resource-group 20221702group --runtime python --functions-version 3 --os-type Linux --consumption-plan-location uksouth --storage-account 20221702sms --name 20221702func
+
+
+az functionapp config appsettings set --resource-group 20221702group --name 20221702func --settings "IOT_HUB_CONNECTION_STRING=Endpoint=sb://ihsuprodlnres013dednamespace.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=eGAzxvQ8lgP3tsgJnZhEGPE0sWe1k6xdxAIoTCZ1aes=;EntityPath=iothub-ehub-20221702hu-56371694-0247e404c5"

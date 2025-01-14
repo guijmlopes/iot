@@ -94,3 +94,6 @@ az functionapp config appsettings set --resource-group 20221702group --name 2022
 
 
 az functionapp config appsettings set --resource-group 20221702group --name 20221702func --settings "REGISTRY_MANAGER_CONNECTION_STRING=HostName=testepraticohub20221702.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=VZP38lkrJkuTYUqg3+EXwYydO+nbvW2KaAIoTMk6wKo="
+
+
+func azure functionapp publish testepratico-func20221702

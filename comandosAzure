@@ -91,3 +91,6 @@ az functionapp create --resource-group 20221702group --runtime python --function
 
 
 az functionapp config appsettings set --resource-group 20221702group --name 20221702func --settings "IOT_HUB_CONNECTION_STRING=Endpoint=sb://ihsuprodlnres013dednamespace.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=eGAzxvQ8lgP3tsgJnZhEGPE0sWe1k6xdxAIoTCZ1aes=;EntityPath=iothub-ehub-20221702hu-56371694-0247e404c5"
+
+
+az functionapp config appsettings set --resource-group 20221702group --name 20221702func --settings "REGISTRY_MANAGER_CONNECTION_STRING=HostName=testepraticohub20221702.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=VZP38lkrJkuTYUqg3+EXwYydO+nbvW2KaAIoTMk6wKo="

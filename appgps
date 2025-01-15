@@ -1,0 +1,62 @@
+from counterfit_connection import CounterFitConnection
+from counterfit_shims_grove.grove_led import GroveLed
+from azure.iot.device import IoTHubDeviceClient, Message, MethodResponse
+import json
+import time
+import counterfit_shims_serial
+import pynmea2
+
+CounterFitConnection.init('127.0.0.1', 5000)
+led_verde = GroveLed(5)   # pin 5
+led_vermelho = GroveLed(6)   # pin 6
+serial = counterfit_shims_serial.Serial('/dev/ttyAMA0')
+
+connection_string = "HostName=testepraticohub20221702.azure-devices.net;DeviceId=testepratico-sensor;SharedAccessKey=KM6tP0gf3vdLb0LxvKmet5Ii8TPSIXe5E+wpxYv2eBo="
+device_client = IoTHubDeviceClient.create_from_connection_string(connection_string)
+print('Connecting...')
+device_client.connect()
+print('Connected!')
+
+def handle_method_request(request):
+    print("Direct method received:", request.name)
+
+    if request.name == "led_verde":
+        led_verde.on()
+        led_vermelho.off()
+    elif request.name == "led_vermelho":
+        led_verde.off()
+        led_vermelho.on() 
+    
+    method_response = MethodResponse.create_from_method_request(request, 200)
+    device_client.send_method_response(method_response)
+
+device_client.on_method_request_received = handle_method_request
+
+def decode_gps_data(data):
+    msg = pynmea2.parse(data)
+    if msg.sentence_type == 'GGA':
+        latitude = pynmea2.dm_to_sd(msg.lat)
+        longitude = pynmea2.dm_to_sd(msg.lon)
+
+        if msg.lat_dir == 'S':
+            latitude *= -1
+        if msg.lon_dir == 'W':
+            longitude *= -1
+        
+        return (latitude, longitude)
+
+while True:
+    valorgps = serial.readline().decode('utf-8')
+    latitude, longitude = decode_gps_data(valorgps)
+
+    message = Message(json.dumps(
+        {'gps': {
+            'lat': latitude,
+            'lon': longitude
+            }
+        }
+    ))
+    device_client.send_message(message)
+    print("Sending message:", message)
+
+    time.sleep(5)
